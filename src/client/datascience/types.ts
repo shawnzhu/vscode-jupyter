@@ -575,7 +575,7 @@ export interface INotebookEditorProvider {
     readonly onDidCloseNotebookEditor: Event<INotebookEditor>;
     open(file: Uri): Promise<INotebookEditor>;
     show(file: Uri): Promise<INotebookEditor | undefined>;
-    createNew(contents?: string, title?: string): Promise<INotebookEditor>;
+    createNew(options?: { contents?: string; defaultCellLanguage?: string }): Promise<INotebookEditor>;
 }
 
 // For native editing, the INotebookEditor acts like a TextEditor and a TextDocument together
@@ -1157,6 +1157,7 @@ export interface IModelLoadOptions {
     file: Uri;
     possibleContents?: string;
     backupId?: string;
+    defaultCellLanguage?: string;
     skipLoadingDirtyContents?: boolean;
 }
 

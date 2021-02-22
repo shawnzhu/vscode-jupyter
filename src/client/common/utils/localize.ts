@@ -975,6 +975,15 @@ export namespace DataScience {
         'DataScience.showDataViewerFail',
         'Failed to create the Data Viewer. Check the Jupyter tab of the Output window for more info.'
     );
+
+    export const kernelTipMessage = localize(
+        'DataScience.kernelTipMessage',
+        'Tip: You can change your notebook kernel in the status bar.'
+    );
+    export const placeHolderToSelectOptionForNotebookCreation = localize(
+        'DataScience.notebookCreationPickerPlaceHolder',
+        'Select an option to create a blank notebook'
+    );
 }
 
 // Skip using vscode-nls and instead just compute our strings based on key values. Key values

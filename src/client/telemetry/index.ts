@@ -390,6 +390,10 @@ export interface IEventNamePropertyMapping {
         count: number;
     };
     [Telemetry.HashedNotebookCellOutputMimeTypePerf]: never | undefined;
+    /**
+     * Whether user has documents with latex or not.
+     */
+    [Telemetry.MarkdownCellHasLatex] : {hasLatex: 'true' | 'false'}
     [Telemetry.HashedCellOutputMimeType]: {
         /**
          * Hash of the cell output mimetype

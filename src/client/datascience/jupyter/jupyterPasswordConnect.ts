@@ -25,7 +25,7 @@ export class JupyterPasswordConnect implements IJupyterPasswordConnect {
         @inject(IMultiStepInputFactory) private readonly multiStepFactory: IMultiStepInputFactory,
         @inject(IAsyncDisposableRegistry) private readonly asyncDisposableRegistry: IAsyncDisposableRegistry,
         @inject(IConfigurationService) private readonly configService: IConfigurationService
-    ) {}
+    ) { }
 
     @captureTelemetry(Telemetry.GetPasswordAttempt)
     public getPasswordConnectionInfo(
@@ -230,6 +230,11 @@ export class JupyterPasswordConnect implements IJupyterPasswordConnect {
                     const sessionResult = await this.getSessionCookie(url, xsrfCookie, userPassword);
                     sessionCookieName = sessionResult.sessionCookieName;
                     sessionCookieValue = sessionResult.sessionCookieValue;
+                } else { // Support kubeflow authnz logic: get session cookie first then xsrf cookie
+                    sessionCookieName = "authservice_session";
+                    sessionCookieValue = userPassword;
+
+                    xsrfCookie = await this.getXSRFTokenFromKubeflow(url, userPassword);
                 }
             } else {
                 // If userPassword is undefined or '' then the user didn't pick a password. In this case return back that we should just try to connect
@@ -322,6 +327,28 @@ export class JupyterPasswordConnect implements IJupyterPasswordConnect {
             method: 'get',
             redirect: 'manual',
             headers: { Connection: 'keep-alive' }
+        });
+
+        if (response.ok) {
+            const cookies = this.getCookies(response);
+            if (cookies.has('_xsrf')) {
+                xsrfCookie = cookies.get('_xsrf')?.split(';')[0];
+            }
+        }
+
+        return xsrfCookie;
+    }
+
+    private async getXSRFTokenFromKubeflow(url: string, password: string): Promise<string | undefined> {
+        let xsrfCookie: string | undefined;
+
+        const response = await this.makeRequest(`${url}tree`, {
+            method: 'get',
+            redirect: 'manual',
+            headers: {
+                Connection: 'keep-alive',
+                'X-Auth-Token': password
+            }
         });
 
         if (response.ok) {
